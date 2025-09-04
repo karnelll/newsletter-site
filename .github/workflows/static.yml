@@ -3,8 +3,8 @@ name: Deploy static site to GitHub Pages
 
 on:
   push:
-    branches: [ "main" ]  # main 브랜치에 푸시될 때마다 배포
-  workflow_dispatch:       # 수동 실행도 허용
+    branches: [ "main" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -25,10 +25,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
         with:
-          path: "."       
+          enablement: true  # ← 없으면 Settings에서 수동으로 Source=GitHub Actions 해줘야 함
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: "."          # index.html이 /docs면 "docs"로 바꿔주세요
 
       - name: Deploy to GitHub Pages
         id: deployment
