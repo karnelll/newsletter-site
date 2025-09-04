@@ -5,81 +5,133 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>뉴스레터 구독</title>
   <style>
+    /* --- 기본 리셋 & 기준 --- */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
+      margin: 0;
       font-family: system-ui, -apple-system, 'Apple SD Gothic Neo', Malgun Gothic, sans-serif;
+      line-height: 1.5;
       background: linear-gradient(135deg, #f3f6ff, #eef2f9);
-      padding: 40px;
+      display: grid;               /* 화면 가운데 정렬 */
+      place-items: center;
+      padding: 24px;
     }
+
+    :root {
+      --radius: 12px;
+      --space-1: 8px;
+      --space-2: 12px;
+      --space-3: 16px;
+      --space-4: 20px;
+      --space-5: 28px;
+      --brand: #0b5fff;
+      --brand-dark: #0048b0;
+      --text-1: #111;
+      --text-2: #333;
+      --line: #e6e6e6;
+      --field: #ffffff;
+      --ok: #0b7f2a;
+      --err: #b00020;
+    }
+
+    /* --- 카드 --- */
     .card {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 32px 28px;
+      width: min(480px, 100%);
       background: #fff;
-      border-radius: 16px;
+      border: 1px solid #eee;
+      border-radius: calc(var(--radius) + 4px);
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      transition: transform 0.2s ease;
+      padding: clamp(20px, 4vw, 32px);
     }
-    .card:hover { transform: translateY(-2px); }
-    h2 {
-      margin: 0 0 28px;
-      text-align: center;
+
+    /* --- 제목도 좌측 정렬: 전체 라인 맞춤 --- */
+    .title {
+      margin: 0 0 var(--space-5) 0;
       font-size: 1.6rem;
-      font-weight: 700;
-      background: linear-gradient(90deg,#0b5fff,#5a87ff);
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      color: var(--text-1);
+      background: linear-gradient(90deg, var(--brand), #5a87ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      text-align: left; /* 좌측 정렬로 라인 통일 */
     }
-    .form-group {
-      margin-bottom: 20px; /* 필드 간 간격 통일 */
+
+    /* --- 폼: 그리드로 간격/정렬 통일 --- */
+    form {
+      display: grid;
+      grid-auto-rows: min-content;
+      gap: var(--space-4); /* 모든 필드 간격을 하나로 통일 */
     }
+
+    .field {
+      display: grid;
+      gap: var(--space-1); /* label과 input 간 간격 */
+    }
+
     label {
-      display: block;
       font-weight: 600;
-      margin-bottom: 8px;
       font-size: 15px;
-      color: #333;
+      color: var(--text-2);
+      margin: 0; /* label 자체 마진 제거 */
     }
+
     input {
       width: 100%;
       padding: 14px 12px;
-      border: 1px solid #ddd;
+      border: 1px solid var(--line);
+      background: var(--field);
       border-radius: 10px;
       font-size: 15px;
-      transition: border 0.2s, box-shadow 0.2s;
-      margin: 0;
+      transition: border-color .2s ease, box-shadow .2s ease;
+      margin: 0; /* 필드 라인 유지 */
     }
     input:focus {
       outline: none;
-      border-color: #0b5fff;
-      box-shadow: 0 0 0 3px rgba(11,95,255,0.2);
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(11,95,255,0.18);
+    }
+
+    /* --- 버튼도 같은 라인/폭 --- */
+    .actions {
+      display: grid;
     }
     button {
-      width: 100%;
       padding: 14px;
       font-size: 16px;
       border: none;
-      border-radius: 12px;
-      font-weight: 600;
+      border-radius: var(--radius);
+      font-weight: 700;
       color: #fff;
-      background: linear-gradient(90deg,#0b5fff,#0060df);
+      background: linear-gradient(90deg, var(--brand), #0060df);
       cursor: pointer;
-      transition: background 0.3s ease, transform 0.15s ease;
+      transition: transform .12s ease, filter .2s ease, background .3s ease;
     }
     button:hover:not(:disabled) {
-      background: linear-gradient(90deg,#0a4fe0,#0048b0);
       transform: translateY(-1px);
+      background: linear-gradient(90deg, #0a4fe0, var(--brand-dark));
+    }
+    button:active:not(:disabled) {
+      transform: translateY(0);
+      filter: brightness(0.98);
     }
     button:disabled {
       opacity: .6;
       cursor: not-allowed;
     }
+
+    /* --- 메시지 --- */
     .msg {
-      margin-top: 16px;
       font-size: 14px;
-      text-align: center;
+      margin: -4px 0 0; /* 버튼과의 시각적 간격 보정 */
+      text-align: left; /* 좌측 정렬로 라인 통일 */
+      min-height: 1.2em; /* 레이아웃 점프 방지 */
     }
-    .msg.error { color: #b00020; }
-    .msg.ok { color: #0b7f2a; }
+    .msg.ok { color: var(--ok); }
+    .msg.error { color: var(--err); }
+
+    /* --- 접근성 숨김(허니팟) --- */
     .hp {
       position: absolute;
       left: -10000px;
@@ -88,11 +140,23 @@
       height: 1px;
       overflow: hidden;
     }
+
+    /* --- 모바일 미세 조정 --- */
+    @media (max-width: 360px) {
+      .title { font-size: 1.45rem; }
+      input, button { font-size: 15px; }
+    }
+
+    /* 모션 민감 사용자 배려 */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>뉴스레터 구독</h2>
+    <h2 class="title">뉴스레터 구독</h2>
+
     <form id="subForm" novalidate>
       <!-- 봇 차단용 허니팟 -->
       <div class="hp">
@@ -100,29 +164,31 @@
         <input type="text" name="website" autocomplete="off"/>
       </div>
 
-      <div class="form-group">
+      <div class="field">
         <label for="email">이메일 *</label>
         <input id="email" name="email" type="email" required placeholder="you@example.com"/>
       </div>
 
-      <div class="form-group">
+      <div class="field">
         <label for="name">이름 (선택)</label>
         <input id="name" name="name" type="text" placeholder="홍길동"/>
       </div>
 
-      <div class="form-group">
+      <div class="field">
         <label for="tags">태그(쉼표로 구분, 선택)</label>
         <input id="tags" name="tags" type="text" placeholder="dev, ai"/>
       </div>
 
-      <div class="form-group">
+      <div class="actions">
         <button id="submitBtn" type="submit">구독하기</button>
       </div>
-      <div id="msg" class="msg"></div>
+
+      <div id="msg" class="msg" aria-live="polite"></div>
     </form>
   </div>
 
   <script>
+    // Activepieces Webhook URL
     const WEBHOOK_URL = "https://cloud.activepieces.com/api/v1/webhooks/jKFCs3RRDQWSQfpI1ynyF";
     const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||"").trim());
 
@@ -139,9 +205,10 @@
         email: form.email.value.trim().toLowerCase(),
         name:  form.name.value.trim(),
         tags:  form.tags.value.trim(),
-        website: form.website ? form.website.value.trim() : ""
+        website: form.website ? form.website.value.trim() : "" // honeypot
       };
 
+      // 1차 검증
       if (data.website) { msg.className='msg error'; msg.textContent='봇 의심 요청입니다.'; return; }
       if (!isEmail(data.email)) { msg.className='msg error'; msg.textContent='이메일 형식을 확인해 주세요.'; return; }
 
