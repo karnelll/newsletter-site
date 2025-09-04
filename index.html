@@ -8,7 +8,7 @@
     body{font-family:system-ui,-apple-system,'Apple SD Gothic Neo',Malgun Gothic,sans-serif;padding:24px}
     .card{max-width:480px;margin:0 auto;padding:20px;border:1px solid #eee;border-radius:12px}
     label{display:block;font-weight:600;margin:12px 0 6px}
-    input,button{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:16px}
+    input,select,button{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:16px}
     button{background:#0b5fff;color:#fff;border:none;cursor:pointer;margin-top:14px}
     .msg{margin-top:12px;font-size:14px}.msg.error{color:#b00020}.msg.ok{color:#0b7f2a}
     .hp{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
@@ -27,8 +27,19 @@
       <label for="name">이름 (선택)</label>
       <input id="name" name="name" type="text" placeholder="홍길동"/>
 
-      <label for="tags">관심 태그 (쉼표 구분, 선택)</label>
+      <!-- 시트의 Tags 컬럼 -->
+      <label for="tags">태그(쉼표로 구분, 선택)</label>
       <input id="tags" name="tags" type="text" placeholder="dev, ai"/>
+
+      <!-- 시트의 Status 컬럼 -->
+      <label for="status">상태</label>
+      <select id="status" name="status">
+        <option value="">(자동)</option>
+        <option value="Active">Active</option>
+        <option value="Test">Test</option>
+        <option value="Pending">Pending</option>
+        <option value="Unsubscribed">Unsubscribed</option>
+      </select>
 
       <button type="submit">구독하기</button>
       <div id="msg" class="msg"></div>
@@ -50,9 +61,11 @@
         email: form.email.value.trim(),
         name:  form.name.value.trim(),
         tags:  form.tags.value.trim(),
+        status: form.status.value.trim(),      // ← 추가
         website: form.website ? form.website.value.trim() : "" // honeypot
       };
 
+      // 1차(클라이언트) 검증
       if (data.website) { msg.className='msg error'; msg.textContent='봇 의심 요청입니다.'; return; }
       if (!isEmail(data.email)) { msg.className='msg error'; msg.textContent='이메일 형식을 확인해 주세요.'; return; }
 
