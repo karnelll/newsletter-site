@@ -21,7 +21,7 @@
     }
     .card:hover { transform: translateY(-2px); }
     h2 {
-      margin-top: 0;
+      margin: 0 0 28px;
       text-align: center;
       font-size: 1.6rem;
       font-weight: 700;
@@ -29,10 +29,13 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    .form-group {
+      margin-bottom: 20px; /* 필드 간 간격 통일 */
+    }
     label {
       display: block;
       font-weight: 600;
-      margin: 18px 0 8px;
+      margin-bottom: 8px;
       font-size: 15px;
       color: #333;
     }
@@ -43,6 +46,7 @@
       border-radius: 10px;
       font-size: 15px;
       transition: border 0.2s, box-shadow 0.2s;
+      margin: 0;
     }
     input:focus {
       outline: none;
@@ -59,7 +63,6 @@
       color: #fff;
       background: linear-gradient(90deg,#0b5fff,#0060df);
       cursor: pointer;
-      margin-top: 20px;
       transition: background 0.3s ease, transform 0.15s ease;
     }
     button:hover:not(:disabled) {
@@ -71,7 +74,7 @@
       cursor: not-allowed;
     }
     .msg {
-      margin-top: 14px;
+      margin-top: 16px;
       font-size: 14px;
       text-align: center;
     }
@@ -97,16 +100,24 @@
         <input type="text" name="website" autocomplete="off"/>
       </div>
 
-      <label for="email">이메일 *</label>
-      <input id="email" name="email" type="email" required placeholder="you@example.com"/>
+      <div class="form-group">
+        <label for="email">이메일 *</label>
+        <input id="email" name="email" type="email" required placeholder="you@example.com"/>
+      </div>
 
-      <label for="name">이름 (선택)</label>
-      <input id="name" name="name" type="text" placeholder="홍길동"/>
+      <div class="form-group">
+        <label for="name">이름 (선택)</label>
+        <input id="name" name="name" type="text" placeholder="홍길동"/>
+      </div>
 
-      <label for="tags">태그(쉼표로 구분, 선택)</label>
-      <input id="tags" name="tags" type="text" placeholder="dev, ai"/>
+      <div class="form-group">
+        <label for="tags">태그(쉼표로 구분, 선택)</label>
+        <input id="tags" name="tags" type="text" placeholder="dev, ai"/>
+      </div>
 
-      <button id="submitBtn" type="submit">구독하기</button>
+      <div class="form-group">
+        <button id="submitBtn" type="submit">구독하기</button>
+      </div>
       <div id="msg" class="msg"></div>
     </form>
   </div>
