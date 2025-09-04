@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>뉴스레터 구독</title>
+  <style>
+    body{font-family:system-ui,-apple-system,'Apple SD Gothic Neo',Malgun Gothic,sans-serif;padding:24px}
+    .card{max-width:480px;margin:0 auto;padding:20px;border:1px solid #eee;border-radius:12px}
+    label{display:block;font-weight:600;margin:12px 0 6px}
+    input,button{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:16px}
+    button{background:#0b5fff;color:#fff;border:none;cursor:pointer;margin-top:14px}
+    .msg{margin-top:12px;font-size:14px}.msg.error{color:#b00020}.msg.ok{color:#0b7f2a}
+    .hp{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>뉴스레터 구독</h2>
+    <form id="subForm" novalidate>
+      <!-- 봇 차단용 허니팟 -->
+      <div class="hp"><label>Leave this empty</label><input type="text" name="website" autocomplete="off"/></div>
+
+      <label for="email">이메일 *</label>
+      <input id="email" name="email" type="email" required placeholder="you@example.com"/>
+
+      <label for="name">이름 (선택)</label>
+      <input id="name" name="name" type="text" placeholder="홍길동"/>
+
+      <label for="tags">관심 태그 (쉼표 구분, 선택)</label>
+      <input id="tags" name="tags" type="text" placeholder="dev, ai"/>
+
+      <button type="submit">구독하기</button>
+      <div id="msg" class="msg"></div>
+    </form>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = "https://cloud.activepieces.com/api/v1/webhooks/jKFCs3RRDQWSQfpI1ynyF";
+    const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||"").trim());
+
+    const form = document.getElementById('subForm');
+    const msg  = document.getElementById('msg');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.className = 'msg'; msg.textContent = '';
+
+      const data = {
+        email: form.email.value.trim(),
+        name:  form.name.value.trim(),
+        tags:  form.tags.value.trim(),
+        website: form.website ? form.website.value.trim() : "" // honeypot
+      };
+
+      if (data.website) { msg.className='msg error'; msg.textContent='봇 의심 요청입니다.'; return; }
+      if (!isEmail(data.email)) { msg.className='msg error'; msg.textContent='이메일 형식을 확인해 주세요.'; return; }
+
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const payload = await res.json();
+        msg.className = res.ok ? 'msg ok' : 'msg error';
+        msg.textContent = payload.message || (res.ok ? '구독 신청 완료' : '전송 오류');
+        if (res.ok) form.reset();
+      } catch {
+        msg.className = 'msg error';
+        msg.textContent = '네트워크 오류. 잠시 후 다시 시도해 주세요.';
+      }
+    });
+  </script>
+</body>
+</html>
