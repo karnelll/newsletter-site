@@ -5,16 +5,86 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>뉴스레터 구독</title>
   <style>
-    body{font-family:system-ui,-apple-system,'Apple SD Gothic Neo',Malgun Gothic,sans-serif;padding:24px}
-    .card{max-width:480px;margin:0 auto;padding:20px;border:1px solid #eee;border-radius:12px}
-    label{display:block;font-weight:600;margin:12px 0 6px}
-    input,button{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:16px}
-    button{background:#0b5fff;color:#fff;border:none;cursor:pointer;margin-top:14px}
-    button:disabled{opacity:.6;cursor:not-allowed}
-    .msg{margin-top:12px;font-size:14px}
-    .msg.error{color:#b00020}
-    .msg.ok{color:#0b7f2a}
-    .hp{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
+    body {
+      font-family: system-ui, -apple-system, 'Apple SD Gothic Neo', Malgun Gothic, sans-serif;
+      background: linear-gradient(135deg, #f3f6ff, #eef2f9);
+      padding: 40px;
+    }
+    .card {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 32px 28px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      transition: transform 0.2s ease;
+    }
+    .card:hover { transform: translateY(-2px); }
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(90deg,#0b5fff,#5a87ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin: 18px 0 8px;
+      font-size: 15px;
+      color: #333;
+    }
+    input {
+      width: 100%;
+      padding: 14px 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #0b5fff;
+      box-shadow: 0 0 0 3px rgba(11,95,255,0.2);
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(90deg,#0b5fff,#0060df);
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.3s ease, transform 0.15s ease;
+    }
+    button:hover:not(:disabled) {
+      background: linear-gradient(90deg,#0a4fe0,#0048b0);
+      transform: translateY(-1px);
+    }
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+    .msg {
+      margin-top: 14px;
+      font-size: 14px;
+      text-align: center;
+    }
+    .msg.error { color: #b00020; }
+    .msg.ok { color: #0b7f2a; }
+    .hp {
+      position: absolute;
+      left: -10000px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
@@ -33,11 +103,8 @@
       <label for="name">이름 (선택)</label>
       <input id="name" name="name" type="text" placeholder="홍길동"/>
 
-      <!-- 시트의 Tags 컬럼과 매핑 -->
       <label for="tags">태그(쉼표로 구분, 선택)</label>
       <input id="tags" name="tags" type="text" placeholder="dev, ai"/>
-
-      <!-- Status 입력 UI 제거: 서버(validate_input)에서 강제 설정 -->
 
       <button id="submitBtn" type="submit">구독하기</button>
       <div id="msg" class="msg"></div>
@@ -45,9 +112,7 @@
   </div>
 
   <script>
-    // Activepieces Webhook URL (Catch Webhook에서 "Copy URL"로 복사한 값)
     const WEBHOOK_URL = "https://cloud.activepieces.com/api/v1/webhooks/jKFCs3RRDQWSQfpI1ynyF";
-
     const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||"").trim());
 
     const form = document.getElementById('subForm');
@@ -63,11 +128,9 @@
         email: form.email.value.trim().toLowerCase(),
         name:  form.name.value.trim(),
         tags:  form.tags.value.trim(),
-        website: form.website ? form.website.value.trim() : "" // honeypot
-        // status는 폼에서 보내지 않음 (서버에서 강제)
+        website: form.website ? form.website.value.trim() : ""
       };
 
-      // 1차(클라이언트) 검증
       if (data.website) { msg.className='msg error'; msg.textContent='봇 의심 요청입니다.'; return; }
       if (!isEmail(data.email)) { msg.className='msg error'; msg.textContent='이메일 형식을 확인해 주세요.'; return; }
 
@@ -81,7 +144,6 @@
           body: JSON.stringify(data)
         });
 
-        // 응답이 JSON이 아닐 수도 있어 대비
         let payload;
         const text = await res.text();
         try { payload = text ? JSON.parse(text) : {}; } catch { payload = { message: text }; }
